@@ -1,57 +1,50 @@
 package sample;
 
-import engine.BackgroundMonitoring;
+import engine.BackgroundMonitorThread;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class Main extends Application {
 
-    private ObservableList<Person> personData = FXCollections.observableArrayList();
     private Stage primaryStage;
-    private AnchorPane rootLayout;
+    private ObservableList<SingleDownloadEntryModel> downloadsList = FXCollections.observableArrayList();
+    private BackgroundMonitorThread backgroundMonitor = BackgroundMonitorThread.getInstance();
+    private Thread backgroundMonitorThread = new Thread(backgroundMonitor);
 
-    public BackgroundMonitoring getBackgroundMonitor() {
+    public Main() {
+
+    }
+
+    @Override
+    public void stop() {
+        this.backgroundMonitor.close();
+        backgroundMonitorThread.interrupt();
+    }
+
+    public BackgroundMonitorThread getBackgroundMonitor() {
         return backgroundMonitor;
     }
 
-    private BackgroundMonitoring backgroundMonitor = BackgroundMonitoring.getInstance();
-
-
-    public Main() {
-        // Add some sample data
-
-    }
     @Override
     public void start(Stage primaryStage) {
+        backgroundMonitorThread.start();
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("AddressApp");
-
-        personData.add(new Person("Ruth", "Mueller"));
-        personData.add(new Person("http://buildlogs.centos.org/rolling/7/isos/x86_64/CentOS-7-x86_64-DVD.iso", "Muster"));
-        personData.add(new Person("http://mirror.centos.org/centos/7/updates/x86_64/Packages/systemd-219-30.el7_3.3.x86_64.rpm", "Kurz"));
-        personData.add(new Person("Cornelia", "Meier"));
-        personData.add(new Person("Werner", "Meyer"));
-        personData.add(new Person("Lydia", "Kunz"));
-        personData.add(new Person("Anna", "Best"));
-        personData.add(new Person("Stefan", "Meier"));
-        personData.add(new Person("Martin", "Mueller"));
 
         try {
             initRootLayout();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        showPersonOverview();
     }
-
 
 
     public void initRootLayout() throws IOException {
@@ -59,11 +52,11 @@ public class Main extends Application {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
 
-            loader.setLocation(Main.class.getResource("sample.fxml"));
+            loader.setLocation(Main.class.getResource("mainDialog.fxml"));
 
-            rootLayout = (AnchorPane) loader.load();
+            AnchorPane rootLayout = loader.load();
 
-            PersonOverviewController controller = loader.getController();
+            MyDownloaderController controller = loader.getController();
             controller.setMainApp(this);
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
@@ -79,27 +72,36 @@ public class Main extends Application {
     }
 
 
-    public ObservableList<Person> getPersonData() {
-        return personData;
+    public ObservableList<SingleDownloadEntryModel> getDownloadsList() {
+        return downloadsList;
     }
 
-
-    public void showPersonOverview() {
+    public void showPersonEditDialog() {
         try {
-            // Load person overview.
+            // Load the fxml file and create a new stage for the popup dialog.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("sample.fxml"));
-            AnchorPane personOverview = (AnchorPane) loader.load();
+            loader.setLocation(Main.class.getResource("newDialog.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
 
-            // Set person overview into the center of root layout.
-          //  rootLayout.setCenter(personOverview);
+            // Create the dialog Stage.
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Edit Person");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
 
-            // Give the controller access to the main app.
-            PersonOverviewController controller = loader.getController();
+            AddItemController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
             controller.setMainApp(this);
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 }

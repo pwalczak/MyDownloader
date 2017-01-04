@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" styleClass="background" stylesheets="@DarkTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.AddItemController">
+   <children>
+      <Label layoutX="14.0" layoutY="48.0" text="Download URL" />
+      <TextField fx:id="tf" layoutX="122.0" layoutY="40.0" minWidth="-Infinity" prefHeight="37.0" prefWidth="170.0" AnchorPane.bottomAnchor="123.0" AnchorPane.rightAnchor="8.0" />
+      <Button layoutX="64.0" layoutY="153.0" mnemonicParsing="false" onAction="#handleOK" text="OK" />
+      <Button layoutX="171.0" layoutY="153.0" mnemonicParsing="false" onAction="#handleCancel" text="Anuluj" />
+   </children>
+</AnchorPane>

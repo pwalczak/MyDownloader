@@ -5,8 +5,13 @@ package engine;
  */
 public interface Downloader extends Runnable {
 
-    public void download() throws Exception;
-    public boolean pause();
-    public boolean cancel();
-    public void close() throws Exception;
+    void download() throws Exception;
+
+    boolean pause();
+
+    boolean cancel();
+
+    void close() throws Exception;
+
+    void getId();
 }
